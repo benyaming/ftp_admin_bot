@@ -18,7 +18,7 @@ class TextHandler(object):
     def _forward_message_to_user(self):
         user_bot = TeleBot(settings.USER_BOT_TOKEN)
         user_bot.send_message(
-            self._user_id,
+            settings.CLIENT_ID,
             self._text
         )
 
