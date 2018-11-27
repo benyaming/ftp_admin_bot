@@ -2,8 +2,9 @@ import telebot
 from telebot.types import Message
 from flask import request, Flask
 
+import db
 import settings
-import text_handler
+from text_handler import TextHandler
 
 
 WEBHOOK_HOST = settings.BOT_HOST
@@ -35,10 +36,24 @@ def handle_start(message):
     )
 
 
+@bot.message_handler(commands=['бух'])
+def handle_start(message: telebot.types.Message):
+    try:
+        comment = message.text.split('/бух')[1]
+        response = '<i>Передано в бухгалтерию</i>'
+        TextHandler(message.from_user.id, response)
+        db.change_worker(message.from_user.id, 'buch')
+        TextHandler(message.from_user.id, comment)
+
+    except IndexError:
+        response = 'Вы не ввели комментарий!'
+        bot.send_message(message.from_user.id, response)
+
+
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def handle_text_message(message: Message):
     # bot.send_chat_action(message.from_user.id, 'typing')
-    text_handler.TextHandler(message).handle_text()
+    TextHandler(message.from_user.id, message.text).handle_text()
 
 
 if __name__ == '__main__':
