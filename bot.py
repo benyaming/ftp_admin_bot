@@ -38,14 +38,14 @@ def handle_start(message):
 
 @bot.message_handler(commands=['бух'])
 def handle_start(message: telebot.types.Message):
-    try:
-        comment = message.text.split('/бух')[1]
+
+    comment = message.text.split('/бух')[1]
+    if comment:
         response = '<i>Передано в бухгалтерию</i>'
         TextHandler(message.from_user.id, response)
         db.change_worker(message.from_user.id, 'buch')
         TextHandler(message.from_user.id, comment)
-
-    except IndexError:
+    else:
         response = 'Вы не ввели комментарий!'
         bot.send_message(message.from_user.id, response)
 
