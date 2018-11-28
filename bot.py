@@ -1,4 +1,3 @@
-from pprint import pformat
 from json import dumps
 
 import telebot
