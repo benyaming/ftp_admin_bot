@@ -21,6 +21,15 @@ def get_operator_name(op_id: int) -> str:
         return cur.fetchone()[0]
 
 
+def get_client_name(client_id: int) -> str:
+    with psycopg2.connect(db_parameters_string) as conn:
+        cur = conn.cursor()
+        query = 'SELECT client_name FROM clients ' \
+                'WHERE tg_id = %s'
+        cur.execute(query, (client_id,))
+        return cur.fetchone()[0]
+
+
 def check_operator_access(op_id: int) -> bool:
     with psycopg2.connect(db_parameters_string) as conn:
         cur = conn.cursor()
