@@ -24,11 +24,7 @@ class TextHandler(object):
             response = f'{self._text}'
         else:
             response = f'<b>{self._operator_name}</b>\n\n{self._text}'
-        user_bot.send_message(
-            settings.CLIENT_ID,
-            response,
-            parse_mode='HTML'
-        )
+        user_bot.send_message(settings.CLIENT_ID, response, parse_mode='HTML')
 
     def _duplicate_message_for_other_operators(self):
         operators = db.get_operators(settings.CLIENT_ID)

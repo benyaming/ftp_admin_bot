@@ -3,6 +3,15 @@ import psycopg2
 from settings import db_parameters_string, CLIENT_ID
 
 
+def check_auth(admin_id: int) -> bool:
+    with psycopg2.connect(db_parameters_string) as conn:
+        cur = conn.cursor()
+        query = 'SELECT exists (SELECT 1 FROM operators ' \
+                '               WHERE tg_id = %s LIMIT 1);'
+        cur.execute(query, (admin_id,))
+        return cur.fetchone()[0]
+
+
 def get_operator_name(op_id: int) -> str:
     with psycopg2.connect(db_parameters_string) as conn:
         cur = conn.cursor()

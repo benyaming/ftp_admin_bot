@@ -4,6 +4,7 @@ from flask import request, Flask
 
 import db
 import settings
+import document_handler
 from text_handler import TextHandler
 
 
@@ -28,7 +29,19 @@ def webhook():
 
 
 # todo приветствие, авторизация
+def check_auth(func):
+    def wrapper(message):
+        if db.check_auth(message.from_user.id):
+            return func(message)
+        else:
+            response = '`Доступ запрещен. Обратитесь к администратору`'
+            bot.send_message(message.from_user.id, response,
+                             parse_mode='Markdown')
+    return wrapper
+
+
 @bot.message_handler(commands=['start'])
+@check_auth
 def handle_start(message):
     bot.send_message(
         message.from_user.id,
@@ -37,6 +50,7 @@ def handle_start(message):
 
 
 @bot.message_handler(commands=['бух'])
+@check_auth
 def handle_buch_command(message: telebot.types.Message):
     if db.check_operator_access(message.from_user.id):
         comment = message.text.split('/бух')[1]
@@ -56,6 +70,7 @@ def handle_buch_command(message: telebot.types.Message):
 
 
 @bot.message_handler(commands=['док'])
+@check_auth
 def handle_buch_command(message: telebot.types.Message):
     if db.check_operator_access(message.from_user.id):
         comment = message.text.split('/док')[1]
@@ -75,6 +90,7 @@ def handle_buch_command(message: telebot.types.Message):
 
 
 @bot.message_handler(commands=['оп'])
+@check_auth
 def handle_buch_command(message: telebot.types.Message):
     if db.check_operator_access(message.from_user.id):
         comment = f'Передано оператору. ' \
@@ -89,12 +105,55 @@ def handle_buch_command(message: telebot.types.Message):
 
 
 @bot.message_handler(func=lambda message: True, content_types=['text'])
+@check_auth
 def handle_text_message(message: Message):
     if db.check_operator_access(message.from_user.id):
         TextHandler(message.from_user.id, message.text).handle_text()
     else:
         response = '`Клиент у другого оператора, сообщение не доставлено!`'
         bot.send_message(message.from_user.id, response, parse_mode='Markdown')
+
+
+@bot.message_handler(func=lambda message: True, content_types=['photo'])
+@check_auth
+def handle_text_message(message: Message):
+    if db.check_operator_access(message.from_user.id):
+        file_id = message.photo[-1].file_id
+        link = f'https://api.telegram.org/file/bot{settings.ADMIN_BOT_TOKEN}/'\
+               f'{bot.get_file(file_id).file_path}'
+        caption = message.caption
+        document_handler.PhotoHandler(message.from_user.id, link,
+                                      caption).handle_photo()
+    else:
+        response = '`Клиент у другого оператора, фото не доставлено!`'
+        bot.send_message(message.from_user.id, response, parse_mode='Markdown')
+
+
+@bot.message_handler(func=lambda message: True, content_types=['document'])
+@check_auth
+def handle_text_message(message: Message):
+    if db.check_operator_access(message.from_user.id):
+        file_id = message.document.file_id
+        link = f'https://api.telegram.org/file/bot{settings.ADMIN_BOT_TOKEN}/'\
+               f'{bot.get_file(file_id).file_path}'
+        caption = message.caption
+        document_handler.DocumentHandler(message.from_user.id, link,
+                                         caption).handle_document()
+    else:
+        response = '`Клиент у другого оператора, фото не доставлено!`'
+        bot.send_message(message.from_user.id, response, parse_mode='Markdown')
+
+
+ignoring_types = ['voice', 'sticker', 'audio', 'video', 'video_note',
+                  'location', 'contact', '']
+
+
+@bot.message_handler(func=lambda message: True, content_types=ignoring_types)
+@check_auth
+def handle_text_message(message: Message):
+    response = '<code>Бот не поддерживает отправку сообщений такого ' \
+               'типа. Пожалуйста, отправьте текст, фото или документ.</code>'
+    bot.send_message(message.from_user.id, response, parse_mode='HTML')
 
 
 if __name__ == '__main__':

@@ -4,6 +4,8 @@ GUNICORN_PORT = environ.get('GUNICORN_PORT')
 
 USER_BOT_TOKEN = environ.get('USER_BOT_TOKEN')
 ADMIN_BOT_TOKEN = environ.get('ADMIN_BOT_TOKEN')
+REPORT_BOT_TOKEN = environ.get('REPORT_BOT_TOKEN')
+
 CLIENT_ID = environ.get('CLIENT_ID')
 
 BOT_HOST = environ.get('BOT_HOST')
