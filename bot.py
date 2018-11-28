@@ -1,3 +1,6 @@
+from pprint import pformat
+from json import dumps
+
 import telebot
 from telebot.types import Message
 from flask import request, Flask
@@ -30,10 +33,11 @@ def webhook():
 
 def report(message: Message):
     report_bot = telebot.TeleBot(settings.REPORT_BOT_TOKEN)
+    formatted_message = dumps(message.json, indent=2)
     report_msg = f'<b>Попытка доступа в операторский бот!</b>\n\n' \
                  f'Клиент бота: ' \
                  f'{db.get_client_name(settings.CLIENT_ID)}\n\n<code>' \
-                 f'{message.json}</code>'
+                 f'{formatted_message}</code>'
     report_bot.send_message(5979588, report_msg, parse_mode='HTML')
 
 
