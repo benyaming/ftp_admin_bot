@@ -32,28 +32,69 @@ def webhook():
 def handle_start(message):
     bot.send_message(
         message.from_user.id,
-        'Welcome! Input station ID'
+        'Welcome!'
     )
 
 
 @bot.message_handler(commands=['бух'])
-def handle_start(message: telebot.types.Message):
-
-    comment = message.text.split('/бух')[1]
-    if comment:
-        response = '<i>Передано в бухгалтерию</i>'
-        TextHandler(message.from_user.id, response)
-        db.change_worker(message.from_user.id, 'buch')
-        TextHandler(message.from_user.id, comment)
+def handle_buch_command(message: telebot.types.Message):
+    if db.check_operator_access(message.from_user.id):
+        comment = message.text.split('/бух')[1]
+        if comment:
+            response = '<i>Перевод в бухгалтерию</i>'
+            TextHandler(message.from_user.id, response,
+                        action=True).handle_text()
+            db.change_worker(settings.CLIENT_ID, 'buch')
+            TextHandler(message.from_user.id, comment, True).handle_text()
+        else:
+            response = '`Вы не ввели комментарий!`'
+            bot.send_message(message.from_user.id, response,
+                             parse_mode='Markdown')
     else:
-        response = 'Вы не ввели комментарий!'
-        bot.send_message(message.from_user.id, response)
+        response = '`Клиент у другого оператора, действие не выполнено!`'
+        bot.send_message(message.from_user.id, response, parse_mode='Markdown')
+
+
+@bot.message_handler(commands=['док'])
+def handle_buch_command(message: telebot.types.Message):
+    if db.check_operator_access(message.from_user.id):
+        comment = message.text.split('/док')[1]
+        if comment:
+            response = '<i>Перевод в документы</i>'
+            TextHandler(message.from_user.id, response,
+                        action=True).handle_text()
+            db.change_worker(settings.CLIENT_ID, 'doc')
+            TextHandler(message.from_user.id, comment, True).handle_text()
+        else:
+            response = '`Вы не ввели комментарий!`'
+            bot.send_message(message.from_user.id, response,
+                             parse_mode='Markdown')
+    else:
+        response = '`Клиент у другого оператора, действие не выполнено!`'
+        bot.send_message(message.from_user.id, response, parse_mode='Markdown')
+
+
+@bot.message_handler(commands=['оп'])
+def handle_buch_command(message: telebot.types.Message):
+    if db.check_operator_access(message.from_user.id):
+        comment = f'Передано оператору. ' \
+                  f'Коммент: {message.text.split("/оп")[1]}'
+        response = '<i>Перевод на оператора</i>'
+        TextHandler(message.from_user.id, response, action=True).handle_text()
+        db.change_worker(settings.CLIENT_ID, 'op')
+        TextHandler(message.from_user.id, comment, True).handle_text()
+    else:
+        response = '`Клиент у другого оператора, действие не выполнено!`'
+        bot.send_message(message.from_user.id, response, parse_mode='Markdown')
 
 
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def handle_text_message(message: Message):
-    # bot.send_chat_action(message.from_user.id, 'typing')
-    TextHandler(message.from_user.id, message.text).handle_text()
+    if db.check_operator_access(message.from_user.id):
+        TextHandler(message.from_user.id, message.text).handle_text()
+    else:
+        response = '`Клиент у другого оператора, сообщение не доставлено!`'
+        bot.send_message(message.from_user.id, response, parse_mode='Markdown')
 
 
 if __name__ == '__main__':
@@ -63,7 +104,6 @@ if __name__ == '__main__':
             url=f'{base_url}{route_path}',
             certificate=open(ssl_cert, 'r')
         )
-
     else:
         bot.remove_webhook()
         bot.polling(True, timeout=50)

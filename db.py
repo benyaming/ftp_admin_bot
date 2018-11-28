@@ -1,6 +1,26 @@
 import psycopg2
 
-from settings import db_parameters_string
+from settings import db_parameters_string, CLIENT_ID
+
+
+def get_operator_name(op_id: int) -> str:
+    with psycopg2.connect(db_parameters_string) as conn:
+        cur = conn.cursor()
+        query = 'SELECT op_name FROM operators ' \
+                'WHERE tg_id = %s'
+        cur.execute(query, (op_id,))
+        return cur.fetchone()[0]
+
+
+def check_operator_access(op_id: int) -> bool:
+    with psycopg2.connect(db_parameters_string) as conn:
+        cur = conn.cursor()
+        worker = get_operator_type(CLIENT_ID)
+
+        query = 'SELECT op_type FROM operators WHERE tg_id = %s'
+        cur.execute(query, (op_id,))
+        op_type = cur.fetchone()[0]
+        return worker == op_type
 
 
 def get_operator_type(client_id: int) -> str:
@@ -17,7 +37,7 @@ def get_operators(client_id: int) -> list:
         operator_type = get_operator_type(client_id)
         cur = conn.cursor()
         query = 'SELECT tg_id FROM operators ' \
-                'WHERE type = %s'
+                'WHERE op_type = %s'
         cur.execute(query, (operator_type,))
         operators = [int(i[0]) for i in cur.fetchall()]
         return operators
