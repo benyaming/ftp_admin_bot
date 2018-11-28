@@ -28,7 +28,15 @@ def webhook():
     return 'ok'
 
 
-# todo приветствие, авторизация
+def report(message: Message):
+    report_bot = telebot.TeleBot(settings.REPORT_BOT_TOKEN)
+    report_msg = f'Попытка доступа в операторский бот!\n\n' \
+                 f'Клиент бота:\n\n' \
+                 f'<code>' \
+                 f'{message.json}</code>'
+    report_bot.send_message(5979588, report_msg, parse_mode='HTML')
+
+
 def check_auth(func):
     def wrapper(message):
         if db.check_auth(message.from_user.id):
@@ -37,6 +45,7 @@ def check_auth(func):
             response = '`Доступ запрещен. Обратитесь к администратору`'
             bot.send_message(message.from_user.id, response,
                              parse_mode='Markdown')
+            report(message)
     return wrapper
 
 
