@@ -16,6 +16,8 @@ class TextHandler(object):
     def handle_text(self):
         if not self._notification:
             self._forward_message_to_user()
+        if self._action:
+            self._send_action_for_all_admins()
         self._duplicate_message_for_other_operators()
 
     def _forward_message_to_user(self):
@@ -41,5 +43,15 @@ class TextHandler(object):
             admin_bot.send_message(
                 operator,
                 res,
+                parse_mode='HTML'
+            )
+
+    def _send_action_for_all_admins(self):
+        admins = db.get_all_admins()
+        for admin in admins:
+            admin_bot = TeleBot(settings.ADMIN_BOT_TOKEN)
+            admin_bot.send_message(
+                admin,
+                self._text,
                 parse_mode='HTML'
             )
