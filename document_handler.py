@@ -11,7 +11,7 @@ class PhotoHandler(object):
     def __init__(self, user_id: int, link: str, caption: str):
         self._user_id = user_id
         self._link = link
-        self._operator_name = db.get_operator_group(self._user_id)
+        self._operator_name = db.get_operator_name(self._user_id)
         self._caption = caption
 
     def handle_photo(self):
@@ -37,7 +37,7 @@ class DocumentHandler(object):
     def __init__(self, user_id: int, link: str, caption: str):
         self._user_id = user_id
         self._link = link
-        self._operator_name = db.get_operator_group(self._user_id)
+        self._operator_name = db.get_operator_name(self._user_id)
         self._caption = caption
 
     def handle_document(self):
