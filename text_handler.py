@@ -11,6 +11,7 @@ class TextHandler(object):
         self._text = text
         self._notification = notification
         self._operator_name = db.get_operator_name(self._user_id)
+        self._operator_group = db.get_operator_group(self._user_id)
         self._action = action
 
     def handle_text(self):
@@ -25,7 +26,7 @@ class TextHandler(object):
         if self._action:
             response = f'{self._text}'
         else:
-            response = f'<b>{self._operator_name}</b>\n\n{self._text}'
+            response = f'<b>{self._operator_group}</b>\n\n{self._text}'
         user_bot.send_message(settings.CLIENT_ID, response, parse_mode='HTML')
 
     def _duplicate_message_for_other_operators(self):

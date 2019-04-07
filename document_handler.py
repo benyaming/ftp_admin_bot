@@ -12,6 +12,7 @@ class PhotoHandler(object):
         self._user_id = user_id
         self._link = link
         self._operator_name = db.get_operator_name(self._user_id)
+        self._operator_group = db.get_operator_group(self._user_id)
         self._caption = caption
 
     def handle_photo(self):
@@ -20,9 +21,9 @@ class PhotoHandler(object):
     def _forward_photo_to_user(self):
         user_bot = TeleBot(settings.USER_BOT_TOKEN)
         if self._caption:
-            caption = f'<b>{self._operator_name}</b>\n\n{self._caption}'
+            caption = f'<b>{self._operator_group}</b>\n\n{self._caption}'
         else:
-            caption = f'<b>{self._operator_name}</b>'
+            caption = f'<b>{self._operator_group}</b>'
 
         connection_pool = urllib3.PoolManager()
         photo = connection_pool.request('GET', self._link)
@@ -38,6 +39,7 @@ class DocumentHandler(object):
         self._user_id = user_id
         self._link = link
         self._operator_name = db.get_operator_name(self._user_id)
+        self._operator_group = db.get_operator_group(self._user_id)
         self._caption = caption
 
     def handle_document(self):
@@ -46,9 +48,9 @@ class DocumentHandler(object):
     def _forward_document_to_user(self):
         user_bot = TeleBot(settings.USER_BOT_TOKEN)
         if self._caption:
-            caption = f'<b>{self._operator_name}</b>\n\n{self._caption}'
+            caption = f'<b>{self._operator_group}</b>\n\n{self._caption}'
         else:
-            caption = f'<b>{self._operator_name}</b>'
+            caption = f'<b>{self._operator_group}</b>'
 
         connection_pool = urllib3.PoolManager()
         document = connection_pool.request('GET', self._link)
