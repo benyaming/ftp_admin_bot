@@ -96,6 +96,6 @@ class DocumentHandler(object):
         document = connection_pool.request('GET', self._link)
 
         for operator in operators:
-            admin_bot.send_photo(operator, document.data,
-                                 caption, parse_mode='HTML')
+            admin_bot.send_document(operator, document.data,
+                                    caption, parse_mode='HTML')
         document.release_conn()
