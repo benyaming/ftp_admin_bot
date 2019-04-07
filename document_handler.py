@@ -97,5 +97,5 @@ class DocumentHandler(object):
 
         for operator in operators:
             admin_bot.send_document(operator, document.data,
-                                    caption, parse_mode='HTML')
+                                    caption=caption, parse_mode='HTML')
         document.release_conn()
