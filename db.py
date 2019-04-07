@@ -12,10 +12,10 @@ def check_auth(admin_id: int) -> bool:
         return cur.fetchone()[0]
 
 
-def get_operator_name(op_id: int) -> str:
+def get_operator_group(op_id: int) -> str:
     with psycopg2.connect(db_parameters_string) as conn:
         cur = conn.cursor()
-        query = 'SELECT op_name FROM operators ' \
+        query = 'SELECT op_group FROM operators ' \
                 'WHERE tg_id = %s'
         cur.execute(query, (op_id,))
         return cur.fetchone()[0]

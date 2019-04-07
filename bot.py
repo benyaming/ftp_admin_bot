@@ -55,10 +55,7 @@ def check_auth(func):
 @bot.message_handler(commands=['start'])
 @check_auth
 def handle_start(message):
-    bot.send_message(
-        message.from_user.id,
-        'Welcome!'
-    )
+    bot.send_message(message.from_user.id, 'Welcome!')
 
 
 @bot.message_handler(commands=['бух'])
