@@ -47,7 +47,9 @@ class PhotoHandler(object):
         connection_pool = urllib3.PoolManager()
         photo = connection_pool.request('GET', self._link)
 
-        admin_bot.send_photo(settings.CLIENT_ID, photo.data, caption, parse_mode='HTML')
+        for operator in operators:
+            admin_bot.send_photo(operator, photo.data,
+                                 caption, parse_mode='HTML')
         photo.release_conn()
 
 
@@ -93,6 +95,7 @@ class DocumentHandler(object):
         connection_pool = urllib3.PoolManager()
         document = connection_pool.request('GET', self._link)
 
-        admin_bot.send_photo(settings.CLIENT_ID, document.data,
-                             caption, parse_mode='HTML')
+        for operator in operators:
+            admin_bot.send_photo(operator, document.data,
+                                 caption, parse_mode='HTML')
         document.release_conn()
