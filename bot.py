@@ -32,7 +32,7 @@ def webhook():
 
 def report(message: Message):
     report_bot = telebot.TeleBot(settings.REPORT_BOT_TOKEN)
-    formatted_message = dumps(message.json, indent=2)
+    formatted_message = dumps(message.json, indent=2).encode('utf8')
     report_msg = f'<b>Попытка доступа в операторский бот!</b>\n\n' \
                  f'Клиент бота: ' \
                  f'{db.get_client_name(settings.CLIENT_ID)}\n\n<code>' \
