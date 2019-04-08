@@ -6,8 +6,8 @@ from flask import request, Flask
 
 import db
 import settings
-import document_handler
 from text_handler import TextHandler
+from media_handler import MediaHandler
 
 
 WEBHOOK_HOST = settings.BOT_HOST
@@ -125,14 +125,13 @@ def handle_text_message(message: Message):
 
 @bot.message_handler(func=lambda message: True, content_types=['photo'])
 @check_auth
-def handle_text_message(message: Message):
+def handle_photo(message: Message):
     if db.check_operator_access(message.from_user.id):
         file_id = message.photo[-1].file_id
         link = f'https://api.telegram.org/file/bot{settings.ADMIN_BOT_TOKEN}/'\
                f'{bot.get_file(file_id).file_path}'
         caption = message.caption
-        document_handler.PhotoHandler(message.from_user.id, link,
-                                      caption).handle_photo()
+        MediaHandler(message.from_user.id, link, caption, 'photo').handle_media()
     else:
         response = '`Клиент у другого оператора, фото не доставлено!`'
         bot.send_message(message.from_user.id, response, parse_mode='Markdown')
@@ -146,8 +145,7 @@ def handle_text_message(message: Message):
         link = f'https://api.telegram.org/file/bot{settings.ADMIN_BOT_TOKEN}/'\
                f'{bot.get_file(file_id).file_path}'
         caption = message.caption
-        document_handler.DocumentHandler(message.from_user.id, link,
-                                         caption).handle_document()
+        MediaHandler(message.from_user.id, link, caption, 'document').handle_media()
     else:
         response = '`Клиент у другого оператора, фото не доставлено!`'
         bot.send_message(message.from_user.id, response, parse_mode='Markdown')
