@@ -58,6 +58,13 @@ def handle_start(message):
     bot.send_message(message.from_user.id, 'Welcome!')
 
 
+@bot.message_handler(commands=['name'])
+@check_auth
+def handle_name_command(message: Message):
+    bot.send_message(message.from_user.id, f'`name: {settings.CLIENT_NAME}`',
+                     parse_mode='Markdown')
+
+
 @bot.message_handler(commands=['бух'])
 @check_auth
 def handle_buch_command(message: telebot.types.Message):

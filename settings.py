@@ -7,6 +7,7 @@ ADMIN_BOT_TOKEN = environ.get('ADMIN_BOT_TOKEN')
 REPORT_BOT_TOKEN = environ.get('REPORT_BOT_TOKEN')
 
 CLIENT_ID = environ.get('CLIENT_ID')
+CLIENT_NAME = environ.get('CLIENT_NAME')
 
 BOT_HOST = environ.get('BOT_HOST')
 BOT_PORT = environ.get('BOT_PORT')
