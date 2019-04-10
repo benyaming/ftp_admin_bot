@@ -61,8 +61,8 @@ def handle_start(message):
 @bot.message_handler(commands=['name'])
 @check_auth
 def handle_name_command(message: Message):
-    bot.send_message(message.from_user.id, f'`name: {settings.CLIENT_NAME}`',
-                     parse_mode='Markdown')
+    resp = f'`name: {settings.CLIENT_NAME}`\n`id: {settings.CLIENT_ID}`'
+    bot.send_message(message.from_user.id, resp, parse_mode='Markdown')
 
 
 @bot.message_handler(commands=['бух'])
