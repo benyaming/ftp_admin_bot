@@ -1,4 +1,4 @@
-import urllib3
+import requests
 
 from telebot import TeleBot
 
@@ -33,12 +33,10 @@ class MediaHandler(object):
         }
         send_media = actions.get(self._media_type)
 
-        connection_pool = urllib3.PoolManager()
-        resp = connection_pool.request('GET', self._link)
-        media = resp.data
+        resp = requests.get(self._link)
+        media = resp.raw
 
         send_media(settings.CLIENT_ID, media, parse_mode='HTML', caption=caption)
-        resp.release_conn()
 
     def _duplicate_message_for_other_operators(self):
         operators = db.get_operators(settings.CLIENT_ID)
