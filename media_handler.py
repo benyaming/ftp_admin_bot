@@ -33,7 +33,7 @@ class MediaHandler(object):
         }
         send_media = actions.get(self._media_type)
 
-        resp = requests.get(self._link)
+        resp = requests.get(self._link, stream=True)
         media = resp.raw
 
         send_media(settings.CLIENT_ID, media, parse_mode='HTML', caption=caption)
