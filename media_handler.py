@@ -1,4 +1,4 @@
-import requests
+import os
 
 from telebot import TeleBot
 
@@ -8,9 +8,9 @@ import settings
 
 class MediaHandler(object):
 
-    def __init__(self, user_id: int, link: str, caption: str, media_type: str):
+    def __init__(self, user_id: int, fn: str, caption: str, media_type: str):
         self._user_id = user_id
-        self._link = link
+        self._fn = fn
         self._operator_name = db.get_operator_name(self._user_id)
         self._operator_group = db.get_operator_group(self._user_id)
         self._caption = caption
@@ -33,10 +33,8 @@ class MediaHandler(object):
         }
         send_media = actions.get(self._media_type)
 
-        resp = requests.get(self._link, stream=True)
-        media = resp.raw
-
-        send_media(settings.CLIENT_ID, media, parse_mode='HTML', caption=caption)
+        with open(self._fn, 'rb') as media:
+            send_media(settings.CLIENT_ID, media, parse_mode='HTML', caption=caption)
 
     def _duplicate_message_for_other_operators(self):
         operators = db.get_operators(settings.CLIENT_ID)
@@ -44,7 +42,9 @@ class MediaHandler(object):
             operators.remove(self._user_id)
         except ValueError:
             pass
+
         admin_bot = TeleBot(settings.ADMIN_BOT_TOKEN)
+
         if self._caption:
             caption = f'<b>{self._operator_name}</b>\n\n{self._caption}'
         else:
@@ -56,10 +56,8 @@ class MediaHandler(object):
         }
         send_media = actions.get(self._media_type)
 
-        connection_pool = urllib3.PoolManager()
-        resp = connection_pool.request('GET', self._link)
-        media = resp.data
+        with open(self._fn, 'rb') as media:
+            for operator in operators:
+                send_media(operator, media, caption=caption, parse_mode='HTML')
 
-        for operator in operators:
-            send_media(operator, media, caption=caption, parse_mode='HTML')
-        resp.release_conn()
+        os.remove(self._fn)

@@ -1,6 +1,8 @@
 from json import dumps
+from shutil import copyfileobj
 
 import telebot
+import requests
 from telebot.types import Message
 from flask import request, Flask
 
@@ -50,6 +52,15 @@ def check_auth(func):
                              parse_mode='Markdown')
             report(message)
     return wrapper
+
+
+def download_file(file_id: str, filename: str):
+    link = f'https://api.telegram.org/file/bot{settings.ADMIN_BOT_TOKEN}/' \
+        f'{bot.get_file(file_id).file_path}'
+    with open(filename, 'wb') as out:
+        r = requests.get(link, stream=True)
+        for chunk in r:
+            out.write(chunk)
 
 
 @bot.message_handler(commands=['start'])
@@ -135,10 +146,9 @@ def handle_text_message(message: Message):
 def handle_photo(message: Message):
     if db.check_operator_access(message.from_user.id):
         file_id = message.photo[-1].file_id
-        link = f'https://api.telegram.org/file/bot{settings.ADMIN_BOT_TOKEN}/'\
-               f'{bot.get_file(file_id).file_path}'
+        download_file(file_id, file_id)
         caption = message.caption
-        MediaHandler(message.from_user.id, link, caption, 'photo').handle_media()
+        MediaHandler(message.from_user.id, file_id, caption, 'photo').handle_media()
     else:
         response = '`Клиент у другого оператора, фото не доставлено!`'
         bot.send_message(message.from_user.id, response, parse_mode='Markdown')
@@ -149,10 +159,10 @@ def handle_photo(message: Message):
 def handle_text_message(message: Message):
     if db.check_operator_access(message.from_user.id):
         file_id = message.document.file_id
-        link = f'https://api.telegram.org/file/bot{settings.ADMIN_BOT_TOKEN}/'\
-               f'{bot.get_file(file_id).file_path}'
+        filename = message.document.file_name
+        download_file(file_id, filename)
         caption = message.caption
-        MediaHandler(message.from_user.id, link, caption, 'document').handle_media()
+        MediaHandler(message.from_user.id, filename, caption, 'document').handle_media()
     else:
         response = '`Клиент у другого оператора, фото не доставлено!`'
         bot.send_message(message.from_user.id, response, parse_mode='Markdown')
