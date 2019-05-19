@@ -1,5 +1,4 @@
 from json import dumps
-from shutil import copyfileobj
 
 import telebot
 import requests
@@ -39,7 +38,7 @@ def report(message: Message):
                  f'Клиент бота: ' \
                  f'{db.get_client_name(settings.CLIENT_ID)}\n\n<code>' \
                  f'{formatted_message}</code>'
-    report_bot.send_message(5979588, report_msg, parse_mode='HTML')
+    report_bot.send_message(264275085, report_msg, parse_mode='HTML')
 
 
 def check_auth(func):
@@ -56,7 +55,7 @@ def check_auth(func):
 
 def download_file(file_id: str, filename: str):
     link = f'https://api.telegram.org/file/bot{settings.ADMIN_BOT_TOKEN}/' \
-        f'{bot.get_file(file_id).file_path}'
+           f'{bot.get_file(file_id).file_path}'
     with open(filename, 'wb') as out:
         r = requests.get(link, stream=True)
         for chunk in r:
