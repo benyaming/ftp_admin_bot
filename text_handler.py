@@ -48,7 +48,7 @@ class TextHandler(object):
             )
 
     def _send_action_for_all_admins(self):
-        admins = db.get_all_admins()
+        admins = db.get_operators(self._user_id)
         for admin in admins:
             admin_bot = TeleBot(settings.ADMIN_BOT_TOKEN)
             admin_bot.send_message(
