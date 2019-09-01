@@ -82,14 +82,12 @@ def handle_buch_command(message: telebot.types.Message):
         comment = message.text.split('/бух')[1]
         if comment:
             response = '<i>Перевод в бухгалтерию</i>'
-            TextHandler(message.from_user.id, response,
-                        action=True).handle_text()
+            TextHandler(message.from_user.id, response, action=True).handle_text()
             db.change_worker(settings.CLIENT_ID, 'buh')
             TextHandler(message.from_user.id, comment, True).handle_text()
         else:
             response = '`Вы не ввели комментарий!`'
-            bot.send_message(message.from_user.id, response,
-                             parse_mode='Markdown')
+            bot.send_message(message.from_user.id, response, parse_mode='Markdown')
     else:
         response = '`Клиент у другого оператора, действие не выполнено!`'
         bot.send_message(message.from_user.id, response, parse_mode='Markdown')
