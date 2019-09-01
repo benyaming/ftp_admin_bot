@@ -84,7 +84,7 @@ def handle_buch_command(message: telebot.types.Message):
             response = '<i>Перевод в бухгалтерию</i>'
             TextHandler(message.from_user.id, response,
                         action=True).handle_text()
-            db.change_worker(settings.CLIENT_ID, 'buch')
+            db.change_worker(settings.CLIENT_ID, 'buh')
             TextHandler(message.from_user.id, comment, True).handle_text()
         else:
             response = '`Вы не ввели комментарий!`'
