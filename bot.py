@@ -44,7 +44,7 @@ def report(message: Message):
 
 def check_auth(func):
     def wrapper(message):
-        if db.check_auth(message.from_userser.id):
+        if db.check_auth(message.from_user.id):
             return func(message)
         else:
             response = '`Доступ запрещен. Обратитесь к администратору`'
