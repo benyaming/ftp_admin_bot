@@ -2,11 +2,12 @@ from json import dumps
 
 import telebot
 import requests
-from telebot.types import Message
+from telebot.types import Message, CallbackQuery
 from flask import request, Flask
 
 import db
 import settings
+import callback_handler
 from text_handler import TextHandler
 from media_handler import MediaHandler
 
@@ -82,9 +83,9 @@ def handle_buch_command(message: telebot.types.Message):
         comment = message.text.split('/бух')[1]
         if comment:
             response = '<i>Перевод в бухгалтерию</i>'
-            TextHandler(message.from_user.id, response, action=True).handle_text()
+            TextHandler(message, custom_text=response, is_action=True).handle_text()
             db.change_worker(settings.CLIENT_ID, 'buh')
-            TextHandler(message.from_user.id, comment, True).handle_text()
+            TextHandler(message, custom_text=comment, is_notification=True).handle_text()
         else:
             response = '`Вы не ввели комментарий!`'
             bot.send_message(message.from_user.id, response, parse_mode='Markdown')
@@ -100,10 +101,9 @@ def handle_buch_command(message: telebot.types.Message):
         comment = message.text.split('/док')[1]
         if comment:
             response = '<i>Перевод в документы</i>'
-            TextHandler(message.from_user.id, response,
-                        action=True).handle_text()
+            TextHandler(message, custom_text=response, is_action=True).handle_text()
             db.change_worker(settings.CLIENT_ID, 'doc')
-            TextHandler(message.from_user.id, comment, True).handle_text()
+            TextHandler(message, custom_text=comment, is_notification=True).handle_text()
         else:
             response = '`Вы не ввели комментарий!`'
             bot.send_message(message.from_user.id, response,
@@ -120,9 +120,9 @@ def handle_buch_command(message: telebot.types.Message):
         comment = f'Передано оператору. ' \
                   f'Коммент: {message.text.split("/оп")[1]}'
         response = '<i>Перевод на оператора</i>'
-        TextHandler(message.from_user.id, response, action=True).handle_text()
+        TextHandler(message, custom_text=response, is_action=True).handle_text()
         db.change_worker(settings.CLIENT_ID, 'op')
-        TextHandler(message.from_user.id, comment, True).handle_text()
+        TextHandler(message, custom_text=comment, is_notification=True).handle_text()
     else:
         response = '`Клиент у другого оператора, действие не выполнено!`'
         bot.send_message(message.from_user.id, response, parse_mode='Markdown')
@@ -132,7 +132,7 @@ def handle_buch_command(message: telebot.types.Message):
 @check_auth
 def handle_text_message(message: Message):
     if db.check_operator_access(message.from_user.id):
-        TextHandler(message.from_user.id, message.text).handle_text()
+        TextHandler(message).handle_text()
     else:
         response = '`Клиент у другого оператора, сообщение не доставлено!`'
         bot.send_message(message.from_user.id, response, parse_mode='Markdown')
@@ -161,7 +161,7 @@ def handle_text_message(message: Message):
         caption = message.caption
         MediaHandler(message.from_user.id, filename, caption, 'document').handle_media()
     else:
-        response = '`Клиент у другого оператора, фото не доставлено!`'
+        response = '`Клиент у другого оператора, документ не доставлен!`'
         bot.send_message(message.from_user.id, response, parse_mode='Markdown')
 
 
@@ -175,6 +175,17 @@ def handle_text_message(message: Message):
     response = '<code>Бот не поддерживает отправку сообщений такого ' \
                'типа. Пожалуйста, отправьте текст, фото или документ.</code>'
     bot.send_message(message.from_user.id, response, parse_mode='HTML')
+
+
+@bot.callback_query_handler(lambda call: True)
+def handle_call(call: CallbackQuery):
+    bot.answer_callback_query(call.id)
+    print(call.data)
+    actions = {
+        'delete': callback_handler.delete_message
+    }
+    action = call.data.split(':')[0]
+    actions.get(action)(call, bot)
 
 
 if __name__ == '__main__':
