@@ -8,4 +8,4 @@ RUN pipenv update
 ENV PYTHONPATH=/home/app
 ENV DOCKER_MODE=true
 EXPOSE 8000
-CMD ["pipenv", "run", "python", "main.py"]
+CMD ["pipenv", "run", "python", "bot.py"]
