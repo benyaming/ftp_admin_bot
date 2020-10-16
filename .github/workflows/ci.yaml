@@ -3,7 +3,7 @@ name: York admin bot CI
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   ci:
