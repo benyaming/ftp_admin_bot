@@ -2,7 +2,7 @@ from telebot import TeleBot
 from telebot.types import CallbackQuery
 from telebot.apihelper import ApiException
 
-from settings import USER_BOT_TOKEN
+from ftp_bot.settings import USER_BOT_TOKEN
 
 
 def delete_message(call: CallbackQuery, admin_bot: TeleBot):

@@ -5,11 +5,9 @@ import requests
 from telebot.types import Message, CallbackQuery
 from flask import request, Flask
 
-import db
-import settings
-import callback_handler
-from text_handler import TextHandler
-from media_handler import MediaHandler
+from ftp_bot import settings, callback_handler, db
+from ftp_bot.text_handler import TextHandler
+from ftp_bot.media_handler import MediaHandler
 
 
 WEBHOOK_HOST = settings.BOT_HOST
@@ -189,12 +187,4 @@ def handle_call(call: CallbackQuery):
 
 
 if __name__ == '__main__':
-    if settings.IS_SERVER:
-        bot.remove_webhook()
-        bot.set_webhook(
-            url=f'{base_url}{route_path}',
-            certificate=open(ssl_cert, 'r')
-        )
-    else:
-        bot.remove_webhook()
-        bot.polling(True, timeout=50)
+    bot.polling(True, timeout=50)

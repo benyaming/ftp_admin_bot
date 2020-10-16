@@ -2,8 +2,7 @@ import os
 
 from telebot import TeleBot
 
-import db
-import settings
+from ftp_bot import settings, db
 
 
 class MediaHandler(object):
