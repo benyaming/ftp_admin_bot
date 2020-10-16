@@ -1,6 +1,6 @@
 import psycopg2
 
-from settings import db_parameters_string, CLIENT_ID
+from ftp_bot.settings import db_parameters_string, CLIENT_ID
 
 
 def check_auth(admin_id: int) -> bool:

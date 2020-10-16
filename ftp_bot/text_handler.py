@@ -1,7 +1,6 @@
 from telebot import TeleBot, types
 
-import settings
-import db
+from ftp_bot import settings, db
 
 
 class TextHandler:
